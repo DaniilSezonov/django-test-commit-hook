@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+from sys import platform
 
 VENV_DIR = 'env'
 
@@ -54,12 +55,21 @@ def main(argv=None):
 
         # Build shell command
         SHELL_EXEC = []
-        v_env_activate = os.path.join(VENV_DIR, 'bin', 'activate')
-        SHELL_EXEC.append(F'set -e')
-        SHELL_EXEC.append(F'source {v_env_activate}')
+        if platform == 'win32':
+            v_env_activate = os.path.join(VENV_DIR, 'Scripts', 'activate.bat')
+            SHELL_EXEC.append(F'{v_env_activate}')
+            SHELL_EXEC.append(F'call {v_env_activate}')
+        else:
+            v_env_activate = os.path.join(VENV_DIR, 'bin', 'activate')
+            SHELL_EXEC.append(F'set -e')
+            SHELL_EXEC.append(F'source {v_env_activate}')
         SHELL_EXEC.append(F'pip install -r {args.requirements} --no-warn-conflicts')
-        SHELL_EXEC.append(F'python {manage_py_path} test {test_directory} --noinput')
-        return_code = os.system(';'.join(SHELL_EXEC))
+        SHELL_EXEC.append(F'pytest')
+
+        if platform == 'win32':
+            return_code = os.system('&'.join(SHELL_EXEC))
+        else:
+            return_code = os.system(';'.join(SHELL_EXEC))
 
         if return_code != 0:
             return 1
