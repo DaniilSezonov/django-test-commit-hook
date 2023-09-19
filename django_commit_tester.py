@@ -2,7 +2,7 @@ import argparse
 import os
 import subprocess
 
-VENV_DIR = 'PRE_COMMIT_VENV'
+VENV_DIR = 'env'
 
 
 def create_venv_dir():
